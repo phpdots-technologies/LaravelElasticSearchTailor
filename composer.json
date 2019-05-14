@@ -5,6 +5,13 @@
     "require": {
         "elasticsearch/elasticsearch": "^6.7"
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "PHPDots\\ElasticSearchTailor\\ElasticSearchTailorServiceProvider"
+            ]
+        }
+    },    
     "license": "MIT",
     "authors": [
         {
