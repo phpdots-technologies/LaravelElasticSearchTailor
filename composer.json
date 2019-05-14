@@ -1,0 +1,21 @@
+{
+    "name": "phpdots/elasticsearchtailor",
+    "description": "data search with elasticsearch package",
+    "type": "library",
+    "require": {
+        "elasticsearch/elasticsearch": "^6.7"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "PHPDots",
+            "email": "admin@phpdots.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+           "PHPDots\\ElasticSearchTailor\\": "src/"
+        }
+    },    
+    "minimum-stability": "stable"
+}
