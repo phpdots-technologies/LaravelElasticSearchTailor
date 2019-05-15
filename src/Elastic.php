@@ -112,7 +112,7 @@ class Elastic
 					$count = count($posts);
 
 					$owner_ids = [];
-					foreach ($posts as $post) 
+					foreach ($posts as $post)
 					{
 						$owner_ids[] = $post->case_file_owners_id;
 					}
@@ -123,12 +123,12 @@ class Elastic
 
 					$party_names = \DB::select(\DB::raw($party_name_sql));
 
-					foreach ($party_names as $party_name) 
+					foreach ($party_names as $party_name)
 					{
 						$party_names2[$party_name->case_file_owners_id] = $party_name->party_name;
 					}
 
-					foreach ($posts as $post) 
+					foreach ($posts as $post)
 					{
 						$post_ownames = $party_names2[$post->case_file_owners_id];
 						$post->party_name = $post_ownames;
@@ -142,11 +142,11 @@ class Elastic
 
 					print_r($result);
 
-					if ($count < 1000) 
+					if ($count < 1000)
 					{
 						$last_count = $i + $count;
 						if ($last_count >= $end_range) {
-							echo $last_count."\r\n";	
+							echo $last_count."\r\n";
 							break;
 						}
 						echo $last_count."\r\n";
@@ -164,14 +164,14 @@ class Elastic
 
 				$j = $start_range;
 				$last_count = 0;
-				while (true) 
+				while (true)
 				{
 					$sql_for_euipo_partial_limit = $sql_for_euipo_partial." LIMIT $j, 1000";
 					$posts = \DB::connection("mysql2")->select( \DB::raw($sql_for_euipo_partial_limit) );
 					$count = count($posts);
 
 					$owner_ids = [];
-					foreach ($posts as $post) 
+					foreach ($posts as $post)
 					{
 						$owner_ids[] = $post->owner_gr_id;
 					}
@@ -179,7 +179,7 @@ class Elastic
 					$party_name_sql = "SELECT current.owner_gr_id,owner.owname FROM current JOIN owner_ids ON current.owner_gr_id=owner.ownergr_id WHERE owner.ownergr_id IN (".implode(',', $owner_ids).")";
 					$party_names = \DB::connection("mysql2")->select( \DB::raw($party_name_sql) );
 
-					foreach ($party_names as $party_name) 
+					foreach ($party_names as $party_name)
 					{
 						$party_names2[$party_name->owner_gr_id] = $party_name->owname;
 					}
@@ -232,7 +232,7 @@ class Elastic
 					$count = count($posts);
 
 					$owner_ids = [];
-					foreach ($posts as $post) 
+					foreach ($posts as $post)
 					{
 						$owner_ids[] = $post->case_file_owners_id;
 					}
@@ -242,7 +242,7 @@ class Elastic
 					WHERE case_file_owners_and_case_file_owner_map.case_file_owners_id IN (".implode(',', $owner_ids).")";
 					$party_names = \DB::select(\DB::raw($party_name_sql));
 
-					foreach ($party_names as $party_name) 
+					foreach ($party_names as $party_name)
 					{
 						$party_names2[$party_name->case_file_owners_id] = $party_name->party_name;
 					}
@@ -261,7 +261,7 @@ class Elastic
 
 					print_r($result);
 
-					if ($count < 1000) 
+					if ($count < 1000)
 					{
 						$last_count = $i + $count;
 						break;
@@ -271,7 +271,7 @@ class Elastic
 				$fp = fopen($description_path.'us_report.json', 'w');
 				fwrite($fp, json_encode( ['last_inserted_count' => $last_count] ) );
 				fclose($fp);
-				
+
 			}
 			elseif ($index == 'euipo')
 			{
@@ -282,7 +282,7 @@ class Elastic
 
 				$j = 0;
 				$last_count = 0;
-				while (true) 
+				while (true)
 				{
 					$sql_for_euipo_partial_limit = $sql_for_euipo_partial." LIMIT $j, 1000";
 					$posts = \DB::connection("mysql2")->select( \DB::raw($sql_for_euipo_partial_limit) );
@@ -297,7 +297,7 @@ class Elastic
 					$party_name_sql = "SELECT * FROM current JOIN owner_ids ON current.owner_gr_id=owner.ownergr_id WHERE owner.ownergr_id IN (".implode(',', $owner_ids).")";
 					$party_names = \DB::connection("mysql2")->select( \DB::raw($party_name_sql) );
 
-					foreach ($party_names as $party_name) 
+					foreach ($party_names as $party_name)
 					{
 						$party_names2[$party_name->owner_gr_id] = $party_name->owname;
 					}
@@ -325,13 +325,13 @@ class Elastic
 				}
 				$fp = fopen($description_path.'eu_report.json', 'w');
 				fwrite($fp, json_encode( ['last_inserted_count' => $last_count] ) );
-				fclose($fp);						
+				fclose($fp);
 			}
 		}
 
 	}
 
-	public function search($keyword, $field, $index, $type, $start_date, $last_date, $exact=0)
+	public function search($index, $type, $start_date, $last_date, $mark_text='', $owner_name='', $exact=0)
 	{
 		$query = [];
 		$query['index'] = $index;
@@ -340,68 +340,46 @@ class Elastic
 			$query['type'] = $type;
 		}
 
-		if ($exact)
-		{
-			if (is_array($field))
-			{
-				$query['body']['query']['bool']['must'][]['query_string'] = [
-					'query' => "\"$keyword\"",
-					'fields' => implode(',', $field)
-				];
-			}
-			elseif (is_string($field))
-			{
-				$query['body']['query']['bool']['must'][]['query_string'] = [
-					'default_field' => $field,
-					'query' => $keyword
-				];
-			}
-			else
-			{
-				throw new Exception("Invalid Field for Search", 1);
-				exit;
-			}
-		}
-		else
-		{
-			if (is_array($field))
-			{
-				$query['body']['query']['bool']['must'][]['multi_match'] = [
-					'query' => $keyword,
-					'fields' => implode(',', $field)
-				];
-			}
-			elseif (is_string($field))
-			{
-				$query['body']['query']['bool']['must'][]['match'] = [
-					$field => $keyword
-				];
-			}
-			else
-			{
-				throw new Exception("Invalid Field for Search", 1);
-				exit;
-			}
-		}
-
 		if ($index == 'uspto')
 		{
-			$query['body']['query']['bool']['must'][]['range']['filing_date'] = [
-				'gte' => $start_date,
-				'lte' => $last_date
-			];
+			if ($exact)
+			{
+				if (!empty($mark_text))
+				{
+					$query['body']['query']['bool']['must'][]['query_string'] = [
+						'query' => "\"$keyword\"",
+						'fields' => "mark_identification"
+					];
+				}
+			}
+			else
+			{
+				if (!empty($mark_text))
+				{
+					$query['body']['query']['bool']['must'][]['match'] = [
+						'mark_identification' => $keyword
+					];
+				}
+			}
+
+			if (!empty($start_date))
+			{
+				$query['body']['query']['bool']['must'][]['range']['filing_date'] = [
+					'gte' => $start_date,
+					'lte' => $last_date
+				];
+			}
 		}
-		elseif ($index == 'euipo')
+
+		try
 		{
-			$query['body']['query']['bool']['must'][]['range']['fil_date'] = [
-				'gte' => $start_date,
-				'lte' => $last_date
-			];
+			$result = $this->client->search($query);
+			return $result['hits']['hits'];
 		}
-
-		$result = $this->client->search($query);
-
-		return $result['hits']['hits'];
+		catch (\Exception $e)
+		{
+			return [];
+		}
 	}
 }
 ?>
