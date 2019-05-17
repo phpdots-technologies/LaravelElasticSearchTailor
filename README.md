@@ -156,6 +156,8 @@ Our Search function will only return:
     ]
 ```
 
+If there is any error `search` function will return only `null array`.
+
 We hope it helps you.
 
 
