@@ -333,6 +333,8 @@ class Elastic
 
 	public function search($index, $type, $start_date, $last_date, $mark_text='', $owner_name='', $exact=0)
 	{
+		$start_date = str_replaace('-', '', $start_date);
+		$last_date = str_replaace('-', '', $last_date);
 		$query = [];
 		$query['index'] = $index;
 		if (!empty($type))
@@ -347,7 +349,7 @@ class Elastic
 				if (!empty($mark_text))
 				{
 					$query['body']['query']['bool']['must'][]['query_string'] = [
-						'query' => "\"$keyword\"",
+						'query' => "\"$mark_text\"",
 						'fields' => "mark_identification"
 					];
 				}
@@ -357,7 +359,7 @@ class Elastic
 				if (!empty($mark_text))
 				{
 					$query['body']['query']['bool']['must'][]['match'] = [
-						'mark_identification' => $keyword
+						'mark_identification' => $mark_text
 					];
 				}
 			}
@@ -369,6 +371,13 @@ class Elastic
 					'lte' => $last_date
 				];
 			}
+		}
+
+		if (!empty($owner_name))
+		{
+			'wildcard' => [
+				'party_name' =>  '*'.$owner_name.'*',
+			]
 		}
 
 		try
