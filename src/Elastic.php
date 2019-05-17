@@ -375,9 +375,11 @@ class Elastic
 
 		if (!empty($owner_name))
 		{
-			'wildcard' => [
-				'party_name' =>  '*'.$owner_name.'*',
-			]
+			$query['body']['query']['bool']['must'][] = [
+				'wildcard' => [
+					'party_name' =>  '*'.$owner_name.'*',
+				]				
+			];
 		}
 
 		try
