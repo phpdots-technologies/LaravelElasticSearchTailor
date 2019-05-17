@@ -49,21 +49,33 @@ $elastic = new Elastic();
 ```
 
 Now, you are ready to use our functions.
-To create a new index in elasrticseearch, we have a function `createIndex` . `createIndex($name='default', $shards=1, $replicas=1)`. It gives acknowledgement from the elasticsearch.
+To create a new index in elasrticseearch, we have a function `createIndex` . 
+
+`createIndex($name='default', $shards=1, $replicas=1)`. 
+
+It gives acknowledgement from the elasticsearch.
 
 For example : 
 ```php
 $result= $this->elastic->createIndex($index, 1, 1);
 ```
 
-To put mappings into a  type/table in elasticsearch, there is a function `putSettings`. `putSettings($index='default', $mappings, $type)`. It also gives acknowledgement from elasticsearch.
-`$mappings` must be an array of valid settings.
+To put mappings into a  type/table in elasticsearch, there is a function `putSettings`. 
+
+`putSettings($index='default', $mappings, $type)`. 
+
+It also gives acknowledgement from elasticsearch. `$mappings` must be an array of valid settings.
+
+
 For example :
 ```php
-$result = $this->elastic->putSettings('uspto', $mapping, 'case_file');
+$result = $this->elastic->putSettings($index, $mapping, $type);
 ```
 
-To index documents/records, we have a function `bulkIndex`. `bulkIndex($index, $indexType, $start_range)`.
+To index documents/records, we have a function `bulkIndex`. 
+
+`bulkIndex($index, $indexType, $start_range)`.
+
 `$index` is index name in which data is going to be indexed. `$indexType` is  `full` or `partial`. In full, all the records are going to be indexed.In full, previously indexed records will be updated. In partial, indexing will start from last indexed record. Only new records are going to be indexed here.
 
 
@@ -72,11 +84,79 @@ Right now, we have too much data to index, so we have decided not to index all t
 For example : 
 ```php
 \\To index data after 9 million records.
-$this->elastic->bulkIndex('uspto', 'full', 9000000);
+$this->elastic->bulkIndex('index', 'full', 9000000);
+```
+
+For the Search, we have just implemented search on some fields which we can improve later. 
+
+`search($index, $type, $start_date, $last_date, $mark_text='', $owner_name='', $exact=0)`. 
+
+Here we have `$index`
+ for index name, `$type` for the type we want to search in, `$start_date` to specify the from which date we want the records, similarly `$end_date` for the last date to which we want the records from, `$mark_text` and `$owner_name` for a specific field and `$exact` keep it 0 for fuzzy search and 1 for exact keyword search for `$mark_text`.
+ 
+ 
+For example : 
+```php
+$result = $this->elastic->search('index_name', 'type_name', '27-05-2019', '01-06-2019', 'mark_text', 'owner_name');
 ```
 
 
+This is a sample return object: 
+```php
+{
+  "took" : 63,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1000,
+    "max_score" : null,
+    "hits" : [ {
+      "_index" : "bank",
+      "_type" : "account",
+      "_id" : "0",
+      "sort": [0],
+      "_score" : null,
+      "_source" : {"account_number":0,"balance":16623,"firstname":"Bradshaw","lastname":"Mckenzie","age":29,"gender":"F","address":"244 Columbus Place","employer":"Euron","email":"bradshawmckenzie@euron.com","city":"Hobucken","state":"CO"}
+    }, {
+      "_index" : "bank",
+      "_type" : "account",
+      "_id" : "1",
+      "sort": [1],
+      "_score" : null,
+      "_source" : {"account_number":1,"balance":39225,"firstname":"Amber","lastname":"Duke","age":32,"gender":"M","address":"880 Holmes Lane","employer":"Pyrami","email":"amberduke@pyrami.com","city":"Brogan","state":"IL"}
+    }, ...
+    ]
+  }
+}
+```
 
+Our Search function will only return:  
+
+```php
+[ {
+      "_index" : "bank",
+      "_type" : "account",
+      "_id" : "0",
+      "sort": [0],
+      "_score" : null,
+      "_source" : {"account_number":0,"balance":16623,"firstname":"Bradshaw","lastname":"Mckenzie","age":29,"gender":"F","address":"244 Columbus Place","employer":"Euron","email":"bradshawmckenzie@euron.com","city":"Hobucken","state":"CO"}
+    }, {
+      "_index" : "bank",
+      "_type" : "account",
+      "_id" : "1",
+      "sort": [1],
+      "_score" : null,
+      "_source" : {"account_number":1,"balance":39225,"firstname":"Amber","lastname":"Duke","age":32,"gender":"M","address":"880 Holmes Lane","employer":"Pyrami","email":"amberduke@pyrami.com","city":"Brogan","state":"IL"}
+    }, ...
+    ]
+```
+
+We hope it helps you.
 
 
 
