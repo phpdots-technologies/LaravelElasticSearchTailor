@@ -333,8 +333,8 @@ class Elastic
 
 	public function search($index, $type, $start_date, $last_date, $mark_text='', $owner_name='', $exact=0)
 	{
-		$start_date = str_replaace('-', '', $start_date);
-		$last_date = str_replaace('-', '', $last_date);
+		$start_date = str_replace('-', '', $start_date);
+		$last_date = str_replace('-', '', $last_date);
 		$query = [];
 		$query['index'] = $index;
 		if (!empty($type))
@@ -378,7 +378,7 @@ class Elastic
 			$query['body']['query']['bool']['must'][] = [
 				'wildcard' => [
 					'party_name' =>  '*'.$owner_name.'*',
-				]				
+				]
 			];
 		}
 
