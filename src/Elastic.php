@@ -331,10 +331,12 @@ class Elastic
 
 	}
 
-	public function search($index, $type, $start_date, $last_date, $mark_text='', $owner_name='', $exact=0)
+	public function search($index, $mark_text, $type='', $exact=0)
 	{
-		$start_date = str_replace('-', '', $start_date);
-		$last_date = str_replace('-', '', $last_date);
+		/*$start_date = strtotime($start_date);
+		$last_date = strtotime($last_date);
+		$start_date = date('Ymd', $start_date);
+		$last_date = date('Ymd', $last_date);*/
 		$query = [];
 		$query['index'] = $index;
 		if (!empty($type))
@@ -364,23 +366,23 @@ class Elastic
 				}
 			}
 
-			if (!empty($start_date))
+			/*if (!empty($start_date))
 			{
 				$query['body']['query']['bool']['must'][]['range']['filing_date'] = [
 					'gte' => $start_date,
 					'lte' => $last_date
 				];
-			}
+			}*/
 		}
 
-		if (!empty($owner_name))
+		/*if (!empty($owner_name))
 		{
 			$query['body']['query']['bool']['must'][] = [
 				'wildcard' => [
 					'party_name' =>  '*'.$owner_name.'*',
 				]
 			];
-		}
+		}*/
 
 		try
 		{
