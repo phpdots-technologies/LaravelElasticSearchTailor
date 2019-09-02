@@ -99,7 +99,7 @@ class Elastic
 				if (!empty($mark_text)) {
 					$query['body']['query']['bool']['must'][]['query_string'] = [
 						'query' => "\"$mark_text\"",
-						'defaul_fields' => "mark_identification"
+						'default_fields' => "mark_identification"
 					];
 				}
 			} else {
@@ -123,7 +123,7 @@ class Elastic
 				if (!empty($mark_text)) {
 					$query['body']['query']['bool']['must'][]['query_string'] = [
 						'query' => "\"*$mark_text*\"",
-						'defaul_fields' => "mark_text"
+						'default_fields' => "mark_text"
 					];
 				}
 			} else {
