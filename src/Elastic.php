@@ -95,11 +95,11 @@ class Elastic
 		}
 
 		if ($index == 'uspto') {
-			if ($exact) {
+			if (!$exact) {
 				if (!empty($mark_text)) {
 					$query['body']['query']['bool']['must'][]['query_string'] = [
 						'query' => "\"$mark_text\"",
-						'fields' => "mark_identification"
+						'defaul_fields' => "mark_identification"
 					];
 				}
 			} else {
@@ -119,11 +119,11 @@ class Elastic
 			}*/
 		}
 		if ($index == "euipo") {
-			if ($exact) {
+			if (!$exact) {
 				if (!empty($mark_text)) {
 					$query['body']['query']['bool']['must'][]['query_string'] = [
 						'query' => "\"*$mark_text*\"",
-						'fields' => "mark_text"
+						'defaul_fields' => "mark_text"
 					];
 				}
 			} else {
