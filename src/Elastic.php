@@ -98,7 +98,7 @@ class Elastic
 			if (!$exact) {
 				if (!empty($mark_text)) {
 					$query['body']['query']['bool']['must'][]['query_string'] = [
-						'query' => "\"$mark_text\"",
+						'query' => "*$mark_text*",
 						'default_field' => "mark_identification"
 					];
 				}
@@ -122,14 +122,14 @@ class Elastic
 			if (!$exact) {
 				if (!empty($mark_text)) {
 					$query['body']['query']['bool']['must'][]['query_string'] = [
-						'query' => "\"*$mark_text*\"",
+						'query' => "*$mark_text*",
 						'default_field' => "mark_text"
 					];
 				}
 			} else {
 				if (!empty($mark_text)) {
 					$query['body']['query']['bool']['must'][]['match'] = [
-						'mark_text' => "\"*$mark_text*\""
+						'mark_text' => $mark_text
 					];
 				}
 			}
