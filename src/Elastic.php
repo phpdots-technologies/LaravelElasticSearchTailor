@@ -128,7 +128,7 @@ class Elastic
 				}
 			} else {
 				if (!empty($mark_text)) {
-					$query['body']['query']['bool']['must'][]['wildcard'] = [
+					$query['body']['query']['bool']['must'][]['match'] = [
 						'mark_text' => "\"*$mark_text*\""
 					];
 				}
