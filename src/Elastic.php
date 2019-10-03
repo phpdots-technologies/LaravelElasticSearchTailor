@@ -40,48 +40,6 @@ class Elastic
 		return $this->client->indices()->delete($params);
 	}
 
-	public function singleDataIndex($index, $type, $body)
-	{
-		$params['body'] = $body;
-		$params['type'] = $type;
-		$params['index'] = $index;
-
-		if (empty($body)) {
-			throw new Exception("Empty array for indexing", 1);
-			exit();
-		}
-
-		$ret = $this->client->index($params);
-		return $ret;
-	}
-
-	public function bulkDataIndex($index, $type, $body)
-	{
-		$respones = [];
-		if (!empty($body)) {
-			for ($i = 0; $i < count($body); $i++) {
-				$params['body'][] = [
-					'index' => [
-						'_index' => $index,
-						'_type' => $type,
-					]
-				];
-
-				$params['body'][] = $body[$i];
-
-				if ($i % 1000) {
-					$respones = $this->client->bulk($params);
-					$params = [];
-				}
-			}
-		} else {
-			throw new Exception("Empty array for Indexing", 1);
-			die();
-		}
-
-		return $respones;
-	}
-
 	public function searchAll($mark_text,$page = 1, $length = 10, $exact = 0, $sort= 0)
 	{
 		/*$start_date = strtotime($start_date);
