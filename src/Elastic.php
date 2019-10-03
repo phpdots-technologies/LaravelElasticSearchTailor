@@ -89,7 +89,7 @@ class Elastic
 		$start_date = date('Ymd', $start_date);
 		$last_date = date('Ymd', $last_date);*/
 		$from = $page * $length;
-		if ($from => 10000) {
+		if (($from+$length) > 10000) {
 			throw new Exception("Search Out of Bound, $page * $length should not be greater or equal to 10,000. ", 1);
 			exit();
 		}
@@ -154,7 +154,7 @@ class Elastic
 		$last_date = strtotime($last_date);
 		$start_date = date('Ymd', $start_date);
 		$last_date = date('Ymd', $last_date);*/
-		$from = $page * $length;
+		$from = ($page - 1) * $length;
 		if (($from+$length) > 10000) {
 			throw new Exception("Search Out of Bound, page * length should not be greater than 10,000. ", 1);
 			exit();
