@@ -72,21 +72,6 @@ For example :
 $result = $this->elastic->putSettings($index, $mapping, $type);
 ```
 
-To index documents/records, we have a function `bulkIndex`. 
-
-`bulkIndex($index, $indexType, $start_range)`.
-
-`$index` is index name in which data is going to be indexed. `$indexType` is  `full` or `partial`. In full, all the records are going to be indexed.In full, previously indexed records will be updated. In partial, indexing will start from last indexed record. Only new records are going to be indexed here.
-
-
-Right now, we have too much data to index, so we have decided not to index all the data in single function call, we can pass `$start_range` , 1,000,000 records after that will be indexed.
-
-For example : 
-```php
-\\To index data after 9 million records.
-$this->elastic->bulkIndex('index', 'full', 9000000);
-```
-
 For the Search, we have just implemented search on some fields which we can improve later. 
 
 `search($index,$mark_text,$page = 1, $length = 10, $exact = 0, $sort= 0)`. 
