@@ -82,58 +82,54 @@ class Elastic
 		return $respones;
 	}
 
-	public function search($index, $mark_text, $type = '', $exact = 0)
+	public function searchAll($mark_text,$page = 1, $length = 10, $exact = 0, $sort= 0)
 	{
 		/*$start_date = strtotime($start_date);
 		$last_date = strtotime($last_date);
 		$start_date = date('Ymd', $start_date);
 		$last_date = date('Ymd', $last_date);*/
+		$from = $page * $length;
+		if ($from => 10000) {
+			throw new Exception("Search Out of Bound, $page * $length should not be greater or equal to 10,000. ", 1);
+			exit();
+		}
+		if (empty($mark_text)) {
+			throw new Exception("Mark Text Should Not Be Null", 1);
+			exit();
+		}
 		$query = [];
-		$query['index'] = $index;
-		if (!empty($type)) {
-			$query['type'] = $type;
+		$query['index'] = "uspto,euipo";
+		$query['from'] = $from;
+		$query['size'] = $length;
+		if ($sort) {
+			$query['body']['sort']['did']['order'] = 'desc';
 		}
 
-		if ($index == 'uspto') {
-			if (!$exact) {
-				if (!empty($mark_text)) {
-					$query['body']['query']['bool']['must'][]['query_string'] = [
-						'query' => "*$mark_text*",
-						'default_field' => "mark_identification"
-					];
-				}
-			} else {
-				if (!empty($mark_text)) {
-					$query['body']['query']['bool']['must'][]['match'] = [
-						'mark_identification' => $mark_text
-					];
-				}
-			}
+		if ($exact) {
+			$query['body']['query']['bool']['should'][]['match'] = [
+				'mark_identification' => $mark_text
+			];
+			$query['body']['query']['bool']['should'][]['match'] = [
+				'mark_text' => $mark_text
+			];
+		} else {
+			$query['body']['query']['bool']['should'][]['query_string'] = [
+				'query' => "*$mark_text*",
+				'default_field' => "mark_identification"
+			];
+			$query['body']['query']['bool']['should'][]['query_string'] = [
+				'query' => "*$mark_text*",
+				'default_field' => "mark_text"
+			];
+		}
 
-			/*if (!empty($start_date))
-			{
-				$query['body']['query']['bool']['must'][]['range']['filing_date'] = [
-					'gte' => $start_date,
-					'lte' => $last_date
-				];
-			}*/
-		}
-		if ($index == "euipo") {
-			if (!$exact) {
-				if (!empty($mark_text)) {
-					$query['body']['query']['bool']['must'][]['query_string'] = [
-						'query' => "*$mark_text*",
-						'default_field' => "mark_text"
-					];
-				}
-			} else {
-				if (!empty($mark_text)) {
-					$query['body']['query']['bool']['must'][]['match'] = [
-						'mark_text' => $mark_text
-					];
-				}
-			}
-		}
+		/*if (!empty($start_date))
+		{
+			$query['body']['query']['bool']['must'][]['range']['filing_date'] = [
+				'gte' => $start_date,
+				'lte' => $last_date
+			];
+		}*/
 
 		/*if (!empty($owner_name))
 		{
@@ -143,6 +139,62 @@ class Elastic
 				]
 			];
 		}*/
+
+		try {
+			$result = $this->client->search($query);
+			return $result['hits']['hits'];
+		} catch (\Exception $e) {
+			return [];
+		}
+	}
+
+	public function search($index, $mark_text, $page = 1, $length = 10, $exact = 0, $sort = 0)
+	{
+		/*$start_date = strtotime($start_date);
+		$last_date = strtotime($last_date);
+		$start_date = date('Ymd', $start_date);
+		$last_date = date('Ymd', $last_date);*/
+		$from = $page * $length;
+		if (($from+$length) > 10000) {
+			throw new Exception("Search Out of Bound, page * length should not be greater than 10,000. ", 1);
+			exit();
+		}
+		if (empty($mark_text)) {
+			throw new Exception("Mark Text Should Not Be Null", 1);
+			exit();
+		}
+		$query = [];
+		$query['index'] = $index;
+		$query['from'] = $from;
+		$query['size'] = $length;
+		if ($sort) {
+			$query['body']['sort'][]['did']['order'] = 'desc';
+		}
+
+		if ($index == 'uspto') {
+			if (!$exact) {
+				$query['body']['query']['bool']['must'][]['query_string'] = [
+					'query' => "*$mark_text*",
+					'default_field' => "mark_identification"
+				];
+			} else {
+				$query['body']['query']['bool']['must'][]['match'] = [
+					'mark_identification' => $mark_text
+				];
+			}
+		}
+		if ($index == "euipo") {
+			if (!$exact) {
+				$query['body']['query']['bool']['must'][]['query_string'] = [
+					'query' => "*$mark_text*",
+					'default_field' => "mark_text"
+				];
+			} else {
+				$query['body']['query']['bool']['must'][]['match'] = [
+					'mark_text' => $mark_text
+				];
+			}
+		}
 
 		try {
 			$result = $this->client->search($query);
