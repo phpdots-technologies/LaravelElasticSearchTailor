@@ -100,7 +100,7 @@ class Elastic
 
 		try {
 			$result = $this->client->search($query);
-			return $result['hits']['hits'];
+			return ['total' => $result['hits']['total'], 'records' => $result['hits']['hits']];
 		} catch (\Exception $e) {
 			return [];
 		}
@@ -156,7 +156,7 @@ class Elastic
 
 		try {
 			$result = $this->client->search($query);
-			return $result['hits']['hits'];
+			return ['total' => $result['hits']['total'], 'records' => $result['hits']['hits']];
 		} catch (\Exception $e) {
 			return [];
 		}
