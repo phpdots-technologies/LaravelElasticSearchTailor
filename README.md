@@ -89,74 +89,66 @@ $this->elastic->bulkIndex('index', 'full', 9000000);
 
 For the Search, we have just implemented search on some fields which we can improve later. 
 
-`search($index, $type, $start_date, $last_date, $mark_text='', $owner_name='', $exact=0)`. 
+`search($index, $mark_text, $page = 1, $length = 10, $exact = 0, $sort = 0)`.
 
-Here we have `$index`
- for index name, `$type` for the type we want to search in, `$start_date` to specify the from which date we want the records, similarly `$end_date` for the last date to which we want the records from, `$mark_text` and `$owner_name` for a specific field and `$exact` keep it 0 for fuzzy search and 1 for exact keyword search for `$mark_text`.
+Here we have `$index` for index name, `$mark_text` for keyword query you want to search.
+`$page` and `$length` are used for pagination. By default, they are 1 and 10, respectively. That will give you result in which records will start from 0 and result will have 10 records. 
  
  
 For example : 
 ```php
-$result = $this->elastic->search('index_name', 'type_name', '27-05-2019', '01-06-2019', 'mark_text', 'owner_name');
+$result = $this->elastic->search('mark_text',1,10, 1, 1);
 ```
 
 
 This is a sample return object: 
 ```php
 {
-  "took" : 63,
+  "took" : 67,
   "timed_out" : false,
   "_shards" : {
-    "total" : 5,
-    "successful" : 5,
+    "total" : 2,
+    "successful" : 2,
     "skipped" : 0,
     "failed" : 0
   },
   "hits" : {
-    "total" : 1000,
+    "total" : 4582,
     "max_score" : null,
-    "hits" : [ {
-      "_index" : "bank",
-      "_type" : "account",
-      "_id" : "0",
-      "sort": [0],
-      "_score" : null,
-      "_source" : {"account_number":0,"balance":16623,"firstname":"Bradshaw","lastname":"Mckenzie","age":29,"gender":"F","address":"244 Columbus Place","employer":"Euron","email":"bradshawmckenzie@euron.com","city":"Hobucken","state":"CO"}
-    }, {
-      "_index" : "bank",
-      "_type" : "account",
-      "_id" : "1",
-      "sort": [1],
-      "_score" : null,
-      "_source" : {"account_number":1,"balance":39225,"firstname":"Amber","lastname":"Duke","age":32,"gender":"M","address":"880 Holmes Lane","employer":"Pyrami","email":"amberduke@pyrami.com","city":"Brogan","state":"IL"}
-    }, ...
-    ]
-  }
-}
-```
-
-Our Search function will only return:  
-
-```php
-[ {
-      "_index" : "bank",
-      "_type" : "account",
-      "_id" : "0",
-      "sort": [0],
-      "_score" : null,
-      "_source" : {"account_number":0,"balance":16623,"firstname":"Bradshaw","lastname":"Mckenzie","age":29,"gender":"F","address":"244 Columbus Place","employer":"Euron","email":"bradshawmckenzie@euron.com","city":"Hobucken","state":"CO"}
-    }, {
-      "_index" : "bank",
-      "_type" : "account",
-      "_id" : "1",
-      "sort": [1],
-      "_score" : null,
-      "_source" : {"account_number":1,"balance":39225,"firstname":"Amber","lastname":"Duke","age":32,"gender":"M","address":"880 Holmes Lane","employer":"Pyrami","email":"amberduke@pyrami.com","city":"Brogan","state":"IL"}
-    }, ...
-    ]
+    "hits" : [
+      {
+        "_index" : "uspto",
+        "_type" : "case_file",
+        "_id" : "9434cb7b902f26f8b56aacb92bf42e74",
+        "_score" : null,
+        "_source" : {
+          "id" : "9434cb7b902f26f8b56aacb92bf42e74",
+          "did" : 23120213,
+          "mark_identification" : "ECHOS CALLING",
+          "serial_number" : "88402444.00",
+          "registration_number" : "0000000",
+          "filing_date" : 20190425,
+          "registration_date" : null,
+          "status_code" : "630",
+          "primary_code" : "033",
+          "case_file_owners_id" : 22640023,
+          "party_name" : "Ste. Michelle Wine Estates Ltd."
+        },
+        "sort" : [
+          23120213
+        ]
+      },......
 ```
 
 If there is any error `search` function will return only `null array`.
+
+We hope it helps you.
+
+We have also added a new function to search a string in all indices.
+
+`searchAll($mark_text,$page = 1, $length = 10, $exact = 0, $sort= 0)`.
+
+It works same as `search` function but gives result from all indices.
 
 We hope it helps you.
 
