@@ -156,7 +156,13 @@ class Elastic
 
 		try {
 			$result = $this->client->search($query);
-			return ['total' => $result['hits']['total'], 'records' => $result['hits']['hits']];
+			$meta = [
+				"total" => $result['hits']['total'],
+				"current_page" => $page,
+				"per_page" => $length,
+				"total_page" => ceil(($result['hits']['total']/$length))
+			];
+			return ['meta' => $meta, 'records' => $result['hits']['hits']];
 		} catch (\Exception $e) {
 			return [];
 		}
