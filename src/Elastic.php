@@ -46,9 +46,10 @@ class Elastic
 		$last_date = strtotime($last_date);
 		$start_date = date('Ymd', $start_date);
 		$last_date = date('Ymd', $last_date);*/
+		$page = $page - 1;
 		$from = $page * $length;
 		if (($from+$length) > 10000) {
-			throw new Exception("Search Out of Bound, $page * $length should not be greater or equal to 10,000. ", 1);
+			throw new Exception("Search Out of Bound, page * length should not be greater or equal to 10,000. ", 1);
 			exit();
 		}
 		if (empty($mark_text)) {
@@ -71,11 +72,11 @@ class Elastic
 				'mark_text' => $mark_text
 			];
 		} else {
-			$query['body']['query']['bool']['should'][]['query_string'] = [
+			$query['body']['query']['bool']['must'][]['query_string'] = [
 				'query' => "*$mark_text*",
 				'default_field' => "mark_identification"
 			];
-			$query['body']['query']['bool']['should'][]['query_string'] = [
+			$query['body']['query']['bool']['must'][]['query_string'] = [
 				'query' => "*$mark_text*",
 				'default_field' => "mark_text"
 			];
@@ -100,7 +101,13 @@ class Elastic
 
 		try {
 			$result = $this->client->search($query);
-			return ['total' => $result['hits']['total'], 'records' => $result['hits']['hits']];
+			$meta = [
+				"total" => $result['hits']['total'],
+				"current_page" => ($page+1),
+				"per_page" => $length,
+				"total_page" => ceil(($result['hits']['total']/$length))
+			];
+			return ['meta' => $meta, 'records' => $result['hits']['hits']];
 		} catch (\Exception $e) {
 			return [];
 		}
@@ -112,7 +119,8 @@ class Elastic
 		$last_date = strtotime($last_date);
 		$start_date = date('Ymd', $start_date);
 		$last_date = date('Ymd', $last_date);*/
-		$from = ($page - 1) * $length;
+		$page = $page - 1;
+		$from = $page * $length;
 		if (($from+$length) > 10000) {
 			throw new Exception("Search Out of Bound, page * length should not be greater than 10,000. ", 1);
 			exit();
@@ -162,7 +170,7 @@ class Elastic
 			$result = $this->client->search($query);
 			$meta = [
 				"total" => $result['hits']['total'],
-				"current_page" => $page,
+				"current_page" => ($page+1),
 				"per_page" => $length,
 				"total_page" => ceil(($result['hits']['total']/$length))
 			];
