@@ -74,12 +74,12 @@ $result = $this->elastic->putSettings($index, $mapping, $type);
 
 For the Search, we have just implemented search on some fields which we can improve later. 
 
-`search($index,$mark_text,$page = 1, $length = 10, $exact = 0, $sort= 0)`. 
+`search($index,$mark_text,$page = 1, $length = 10, $sort= 1, $exact = 0)`. 
 
 Here we have `$mark_text` for searching keyword and `$index` for searching in particular index. 
 We have also added `$page` and `$length` for pagination. For example, if $page=1 and $length=20, result will give you 20 records starting from 0.
 We have `$exact`, if want to use the exact word. 
-We have `$sort`, if want to sort the result as per id descending.
+We have `$sort`, it will sort the result documents as per their filing_date or application date('descending'). By default, it is 1. You can always turn it off.
  
  
 For example : 
@@ -131,7 +131,7 @@ If there is any error `search` function will return only `null array`.
 
 We have also added a function for searching in All indices.
 
-`searchAll($mark_text,$page = 1, $length = 10, $exact = 0, $sort= 0)`.
+`searchAll($mark_text,$page = 1, $length = 10, $sort= 1, $exact = 0)`.
 
 It works same as `search` function but gives records from all indices.
 

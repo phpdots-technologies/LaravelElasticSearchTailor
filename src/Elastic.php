@@ -40,7 +40,7 @@ class Elastic
 		return $this->client->indices()->delete($params);
 	}
 
-	public function searchAll($mark_text,$page = 1, $length = 10, $exact = 0, $sort= 0)
+	public function searchAll($mark_text,$page = 1, $length = 10, $sort = 1, $exact = 0)
 	{
 		/*$start_date = strtotime($start_date);
 		$last_date = strtotime($last_date);
@@ -60,7 +60,7 @@ class Elastic
 		$query['from'] = $from;
 		$query['size'] = $length;
 		if ($sort) {
-			$query['body']['sort']['did']['order'] = 'desc';
+			$query['body']['sort']['application_date']['order'] = 'desc';
 		}
 
 		if ($exact) {
@@ -106,8 +106,8 @@ class Elastic
 		}
 	}
 
-	public function search($index, $mark_text, $page = 1, $length = 10, $exact = 0, $sort = 0)
-	{
+	public function search($index, $mark_text, $page = 1, $length = 10, $sort = 1, $exact = 0)
+	{ 
 		/*$start_date = strtotime($start_date);
 		$last_date = strtotime($last_date);
 		$start_date = date('Ymd', $start_date);
@@ -121,12 +121,16 @@ class Elastic
 			throw new Exception("Mark Text Should Not Be Null", 1);
 			exit();
 		}
+		if (empty($index)) {
+			throw new Exception("Index Name Should Not Be Null", 1);
+			exit();
+		}
 		$query = [];
 		$query['index'] = $index;
 		$query['from'] = $from;
 		$query['size'] = $length;
 		if ($sort) {
-			$query['body']['sort'][]['did']['order'] = 'desc';
+			$query['body']['sort'][]['application_date']['order'] = 'desc';
 		}
 
 		if ($index == 'uspto') {
