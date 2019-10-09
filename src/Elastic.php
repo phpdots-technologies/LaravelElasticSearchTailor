@@ -72,11 +72,11 @@ class Elastic
 				'mark_text' => $mark_text
 			];
 		} else {
-			$query['body']['query']['bool']['must'][]['query_string'] = [
+			$query['body']['query']['bool']['should'][]['query_string'] = [
 				'query' => "*$mark_text*",
 				'default_field' => "mark_identification"
 			];
-			$query['body']['query']['bool']['must'][]['query_string'] = [
+			$query['body']['query']['bool']['should'][]['query_string'] = [
 				'query' => "*$mark_text*",
 				'default_field' => "mark_text"
 			];
